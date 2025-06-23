@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Upload, User, Eye, EyeOff } from 'lucide-react';
+import { Upload, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import backgroundImage from '../assets/background.jpg';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +13,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,7 +72,7 @@ const Register = () => {
   };
 
   const handleLoginRedirect = () => {
-    alert('Redirecting to login page...');
+    navigate('/login');
   };
 
   return (
@@ -77,29 +80,20 @@ const Register = () => {
       {/* Left side - Background with image */}
       <div 
         className="w-1/2 bg-cover bg-center relative"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(99, 102, 241, 0.7), rgba(168, 85, 247, 0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="grad1" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgb(147,51,234);stop-opacity:0.3" /><stop offset="100%" style="stop-color:rgb(59,130,246);stop-opacity:0.8" /></radialGradient></defs><rect width="100%" height="100%" fill="url(%23grad1)"/><circle cx="200" cy="300" r="150" fill="rgba(255,255,255,0.1)"/><circle cx="800" cy="700" r="100" fill="rgba(255,255,255,0.05)"/><circle cx="600" cy="200" r="80" fill="rgba(255,255,255,0.08)"/></svg>')`,
-          filter: "brightness(0.8)",
-        }}
+        style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         {/* Back arrow */}
-        <div className="absolute top-4 left-4 text-white text-4xl cursor-pointer hover:text-gray-200 transition-colors">
-          ←
-        </div>
-        
-        {/* Content overlay */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-8">
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20 max-w-md">
-            <h1 className="text-4xl font-bold mb-4">Join Our Community</h1>
-            <p className="text-lg opacity-90 leading-relaxed">
-              Create your account and start your journey with us. Connect, share, and grow together.
-            </p>
-          </div>
-        </div>
+        <button 
+          onClick={() => navigate('/')}
+          className="absolute top-4 left-4 text-white p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+          aria-label="Back to home"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
       </div>
 
       {/* Right side - Form */}
-      <div className="w-1/2 flex flex-col justify-center items-center bg-white">
+      <div className="w-1/2 flex flex-col justify-center items-center bg-white overflow-y-auto py-10">
         <div className="w-3/4 max-w-md">
           {/* Profile Picture Upload Section */}
           <div className="text-center mb-6">
@@ -115,7 +109,7 @@ const Register = () => {
                   <User className="text-gray-600 w-12 h-12" />
                 )}
               </div>
-              <label htmlFor="profile-upload" className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 cursor-pointer transition-colors shadow-lg">
+              <label htmlFor="profile-upload" className="absolute bottom-0 right-0 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 cursor-pointer transition-colors shadow-lg">
                 <Upload className="w-3 h-3" />
               </label>
               <input
@@ -139,7 +133,7 @@ const Register = () => {
               value={formData.username}
               onChange={handleInputChange}
               className={`w-full p-3 border rounded-md transition-colors ${
-                errors.username ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
+                errors.username ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
               } focus:outline-none`}
             />
             {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
@@ -153,7 +147,7 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 className={`w-full p-3 border rounded-md pr-10 transition-colors ${
-                  errors.password ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
+                  errors.password ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
                 } focus:outline-none`}
               />
               <button
@@ -175,7 +169,7 @@ const Register = () => {
                 value={formData.retypePassword}
                 onChange={handleInputChange}
                 className={`w-full p-3 border rounded-md pr-10 transition-colors ${
-                  errors.retypePassword ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
+                  errors.retypePassword ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
                 } focus:outline-none`}
               />
               <button
@@ -191,7 +185,7 @@ const Register = () => {
             {/* Register Button */}
             <button
               onClick={handleSubmit}
-              className="w-full bg-black text-white py-3 rounded-md hover:bg-red-600 transition-colors font-medium"
+              className="w-full bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-colors font-medium"
             >
               Register
             </button>
@@ -202,7 +196,7 @@ const Register = () => {
             Already have an account?{" "}
             <button 
               onClick={handleLoginRedirect}
-              className="underline text-blue-600 hover:text-blue-800 transition-colors"
+              className="underline text-red-600 hover:text-red-800 transition-colors"
             >
               Login
             </button>
@@ -211,7 +205,7 @@ const Register = () => {
           {/* Login Button */}
           <button
             onClick={handleLoginRedirect}
-            className="mt-2 w-full bg-black text-white py-3 rounded-md hover:bg-red-600 transition-colors font-medium"
+            className="mt-2 w-full bg-black text-white py-3 rounded-md hover:bg-red-700 transition-colors font-medium"
           >
             Login
           </button>
