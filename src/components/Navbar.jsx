@@ -3,14 +3,14 @@ import { NavLink, Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
-    <nav className="navbar">
+    <nav className="navbar bg-black text-white shadow-lg">
       <div className="logo">
         <img
           src={MyLogo}
           alt="horse"
           style={{
-            width: '75px',
-            height: '75px',
+            width: '50px',
+            height: '50px',
             borderRadius: '50%',
             objectFit: 'cover',
           }}
@@ -21,7 +21,7 @@ const Navbar = () => {
         <NavLink
           to="/"
           className={({ isActive }) =>
-            isActive ? 'nav-link active' : 'nav-link'
+            isActive ? 'nav-link active text-red-500' : 'nav-link text-white hover:text-red-400'
           }
         >
           Home
@@ -30,7 +30,7 @@ const Navbar = () => {
         <NavLink
           to="/coaches"
           className={({ isActive }) =>
-            isActive ? 'nav-link active' : 'nav-link'
+            isActive ? 'nav-link active text-red-500' : 'nav-link text-white hover:text-red-400'
           }
         >
           Coaches
@@ -39,20 +39,19 @@ const Navbar = () => {
         <NavLink
           to="/premium"
           className={({ isActive }) =>
-            isActive ? 'nav-link active' : 'nav-link'
+            isActive ? 'nav-link active text-red-500' : 'nav-link text-white hover:text-red-400'
           }
         >
           Premium
         </NavLink>
       </div>
 
-      <div className="auth-buttons">
+      <div className="auth-buttons flex gap-4">
         <Link to="/login">
-          <button className="button-red">Login</button>
+          <button className="button-red bg-red-600 hover:bg-red-700 text-white">Login</button>
         </Link>
-        <span className="or"> </span>
         <Link to="/register">
-          <button className="button-red">Register</button>
+          <button className="button-red bg-red-600 hover:bg-red-700 text-white">Register</button>
         </Link>
       </div>
     </nav>

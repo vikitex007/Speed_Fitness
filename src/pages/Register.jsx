@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import { Upload, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/background.jpg';
+import apiService from '../services/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    retypePassword: ''
+    retypePassword: '',
+    userType: 'user',
   });
-  const [profileImage, setProfileImage] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -27,6 +31,9 @@ const Register = () => {
         [name]: ''
       }));
     }
+    if (apiError) {
+      setApiError("");
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -34,7 +41,7 @@ const Register = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setProfileImage(e.target.result);
+        setProfilePicture(e.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -63,11 +70,37 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Registration data:', { ...formData, profileImage });
-      alert('Registration successful!');
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError("");
+
+    try {
+      const registrationData = {
+        username: formData.username,
+        password: formData.password,
+        retypePassword: formData.retypePassword,
+        profilePicture: profilePicture,
+        userType: formData.userType,
+      };
+
+      const response = await apiService.register(registrationData);
+      
+      if (response.success) {
+        alert('Registration successful!');
+        // Redirect to login after successful registration
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setApiError(error.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,9 +132,9 @@ const Register = () => {
           <div className="text-center mb-6">
             <div className="relative inline-block">
               <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden hover:bg-gray-300 transition-colors cursor-pointer">
-                {profileImage ? (
+                {profilePicture ? (
                   <img 
-                    src={profileImage} 
+                    src={profilePicture} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
                   />
@@ -118,13 +151,50 @@ const Register = () => {
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="hidden"
+                disabled={isLoading}
               />
             </div>
             <p className="text-gray-600 text-sm">Upload Picture</p>
           </div>
 
+          {/* API Error Display */}
+          {apiError && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {apiError}
+            </div>
+          )}
+
           {/* Form */}
           <div className="space-y-4">
+            {/* User Type Selector */}
+            <div className="mb-4">
+              <div className="font-semibold text-gray-900 mb-2 text-lg">Select Account Type:</div>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer text-gray-900 text-base">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="user"
+                    checked={formData.userType === 'user'}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                  />
+                  <span>User</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-gray-900 text-base">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="trainer"
+                    checked={formData.userType === 'trainer'}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                  />
+                  <span>Trainer</span>
+                </label>
+              </div>
+            </div>
+
             {/* Username */}
             <input
               type="text"
@@ -132,9 +202,10 @@ const Register = () => {
               placeholder="Enter Username"
               value={formData.username}
               onChange={handleInputChange}
-              className={`w-full p-3 border rounded-md transition-colors ${
-                errors.username ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
-              } focus:outline-none`}
+              disabled={isLoading}
+              className={`w-full p-3 border rounded-md transition-colors text-gray-900 ${
+                errors.username ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400 focus:border-red-500 bg-white'
+              } focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             />
             {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
 
@@ -146,14 +217,16 @@ const Register = () => {
                 placeholder="Enter Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full p-3 border rounded-md pr-10 transition-colors ${
-                  errors.password ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
-                } focus:outline-none`}
+                disabled={isLoading}
+                className={`w-full p-3 border rounded-md pr-10 transition-colors text-gray-900 ${
+                  errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400 focus:border-red-500 bg-white'
+                } focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={isLoading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -168,14 +241,16 @@ const Register = () => {
                 placeholder="Retype Password"
                 value={formData.retypePassword}
                 onChange={handleInputChange}
-                className={`w-full p-3 border rounded-md pr-10 transition-colors ${
-                  errors.retypePassword ? 'border-red-500' : 'border-gray-300 hover:border-gray-400 focus:border-red-500'
-                } focus:outline-none`}
+                disabled={isLoading}
+                className={`w-full p-3 border rounded-md pr-10 transition-colors text-gray-900 ${
+                  errors.retypePassword ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400 focus:border-red-500 bg-white'
+                } focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
               />
               <button
                 type="button"
                 onClick={() => setShowRetypePassword(!showRetypePassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={isLoading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
               >
                 {showRetypePassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -185,9 +260,12 @@ const Register = () => {
             {/* Register Button */}
             <button
               onClick={handleSubmit}
-              className="w-full bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-colors font-medium"
+              disabled={isLoading}
+              className={`w-full bg-red-600 text-white py-3 rounded-md transition-colors font-medium ${
+                isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700"
+              }`}
             >
-              Register
+              {isLoading ? "Registering..." : "Register"}
             </button>
           </div>
 
@@ -201,14 +279,6 @@ const Register = () => {
               Login
             </button>
           </p>
-
-          {/* Login Button */}
-          <button
-            onClick={handleLoginRedirect}
-            className="mt-2 w-full bg-black text-white py-3 rounded-md hover:bg-red-700 transition-colors font-medium"
-          >
-            Login
-          </button>
         </div>
       </div>
     </div>

@@ -15,8 +15,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #1e1e1e;
-  padding: 20px 50px;
+  background-color: #000000;
+  padding: 12px 50px;
   position: sticky;
   top: 0;
   z-index: 1000;
