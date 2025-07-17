@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Home, Crown, MessageCircle, UserCog, LogOut } from 'lucide-react';
 import MyLogo from '../assets/MyLogo.png';
 import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 
 const Sidebar = ({ role = 'user', activePage = '' }) => {
   const navigate = useNavigate();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogout = () => {
-    // You can add your logout logic here if needed
+    setShowLogoutDialog(true);
+  };
+
+  const confirmLogout = () => {
+    apiService.logout();
     navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutDialog(false);
   };
 
   // Sidebar links for user and trainer
@@ -47,6 +57,20 @@ const Sidebar = ({ role = 'user', activePage = '' }) => {
           <LogOut className="w-6 h-6" /> Logout
         </button>
       </nav>
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+            <div className="text-lg font-semibold mb-4 text-gray-900">Confirm Logout</div>
+            <div className="mb-6 text-gray-700">Are you sure you want to logout?</div>
+            <div className="flex justify-end gap-3">
+              <button onClick={cancelLogout} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">Cancel</button>
+              <button onClick={confirmLogout} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };

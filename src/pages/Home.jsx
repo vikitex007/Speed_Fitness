@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { 
   Dumbbell, 
   Users, 
@@ -15,6 +17,9 @@ import {
 } from 'lucide-react';
 import Gym1 from '../assets/b.jpg';
 import HeroVideo from '../assets/hero-video.mp4';
+
+
+
 
 const Home = () => {
   const [videoError, setVideoError] = useState(false);
@@ -102,8 +107,8 @@ const Home = () => {
   ];
 
   const stats = [
-    { number: '500+', label: 'Active Members', icon: Users },
-    { number: '5+', label: 'Expert Trainers', icon: Award },
+    { number: '200+', label: 'Active Members', icon: Users },
+    { number: '3+', label: 'Expert Trainers', icon: Award },
     { number: '100+', label: 'Equipment Pieces', icon: Dumbbell },
     { number: '24/7', label: 'Support Available', icon: Clock }
   ];
@@ -111,6 +116,7 @@ const Home = () => {
   const handleVideoError = () => {
     setVideoError(true);
   };
+  const navigate = useNavigate();
 
   return (
     <div className="bg-black text-white font-sans overflow-hidden">
@@ -150,7 +156,10 @@ const Home = () => {
               <span className="text-red-400 font-medium">Speed Fitness मा स्वागत छ जहाँ बहाना सकिन्छ र सफलता सुरु हुन्छ।</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="group bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-bold text-lg shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+              <button
+                className="group bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-bold text-lg shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                onClick={() => navigate('/register')}
+              >
                 Start Your Journey
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -324,14 +333,19 @@ const Home = () => {
                       </div>
                     ))}
                   </div>
+              
                   
-                  <button className={`w-full py-3 px-6 rounded-xl font-bold transition-all duration-300 transform group-hover:scale-105 ${
-                    pkg.popular 
-                      ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg'
-                      : 'bg-gray-700 hover:bg-gray-600 text-white'
-                  }`}>
-                    Get Started
-              </button>
+                    <button onClick={() => navigate('/register')}
+                      type="button"
+                      className={`w-full py-3 px-6 rounded-xl font-bold transition-all duration-300 transform group-hover:scale-105 ${
+                        pkg.popular
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg'
+                          : 'bg-gray-700 hover:bg-gray-600 text-white'
+                      }`}
+                    >
+                      Get Started
+                    </button>
+                  
                 </div>
             </div>
           ))}

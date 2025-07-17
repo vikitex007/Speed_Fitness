@@ -14,6 +14,7 @@ const {
   recordWorkout,
   getAllUsers,
   getPremiumUsers,
+  getTrainerData,
 } = require("../controller/authController");
 
 const router = express.Router();
@@ -172,5 +173,6 @@ router.post("/record-workout", auth, recordWorkoutValidation, recordWorkout);
 
 router.get("/users", authenticate, getAllUsers);
 router.get("/users/premium", authenticate, getPremiumUsers);
+router.get("/trainer", auth, getTrainerData);
 
 module.exports = router;

@@ -43,6 +43,7 @@ import MyLogo from '../assets/MyLogo.png';
 import TrainerAvatar from '../assets/cbum.png';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
+import TrainerToUserChatModal from '../components/TrainerToUserChatModal';
 
 // Register ChartJS components
 ChartJS.register(
@@ -86,6 +87,7 @@ const TrainerDashboard = () => {
         console.error('Error fetching users:', err); // Debug log
       }
     };
+
     fetchUsers();
   }, []);
 
@@ -249,7 +251,7 @@ const TrainerDashboard = () => {
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Sidebar role="trainer" activePage="dashboard" />
       <div className="flex-1 flex flex-col min-h-screen">
-        <PageHeader title="Dashboard" />
+        <PageHeader title="Dashboard" profilePicture={currentUser?.profilePicture} />
         <main className="flex-1 p-8 flex flex-col items-center">
           <div className="w-full max-w-5xl mx-auto">
             {/* Trainer Info Card */}
@@ -324,26 +326,26 @@ const TrainerDashboard = () => {
                 </table>
               </div>
             </div>
-            {/* Chat Modal Placeholder */}
+
+
+
+            {/* Chat Modal */}
             {showChat && selectedUser && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-                <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
-                  <div className="text-lg font-semibold mb-4">Chat with {selectedUser.name}</div>
-                  <div className="mb-6">(Chat UI goes here)</div>
-                  <div className="flex justify-end gap-3">
-                    <button onClick={() => setShowChat(false)} className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Close</button>
-                  </div>
-                </div>
-              </div>
+              <TrainerToUserChatModal 
+                open={showChat} 
+                onClose={() => setShowChat(false)} 
+                trainer={currentUser}
+                user={selectedUser}
+              />
             )}
             {/* Logout Dialog */}
             {showLogoutDialog && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
                 <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
-                  <div className="text-lg font-semibold mb-4">Confirm Logout</div>
-                  <div className="mb-6">Are you sure you want to logout?</div>
+                  <div className="text-lg font-semibold mb-4 text-gray-900">Confirm Logout</div>
+                  <div className="mb-6 text-gray-700">Are you sure you want to logout?</div>
                   <div className="flex justify-end gap-3">
-                    <button onClick={cancelLogout} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
+                    <button onClick={cancelLogout} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">Cancel</button>
                     <button onClick={confirmLogout} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Logout</button>
                   </div>
                 </div>

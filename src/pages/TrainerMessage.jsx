@@ -3,24 +3,33 @@ import Sidebar from '../components/Sidebar';
 import { MessageCircle, User } from 'lucide-react';
 import apiService from '../services/api';
 import PageHeader from '../components/PageHeader';
+import TrainerToUserChatModal from '../components/TrainerToUserChatModal';
 
 const TrainerMessage = () => {
-  const [premiumUsers, setPremiumUsers] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const fetchPremiumUsers = async () => {
+    const fetchConversations = async () => {
       try {
-        const res = await apiService.getPremiumUsers();
+        setLoadingConversations(true);
+        const res = await apiService.getTrainerConversations();
         if (res.success) {
-          setPremiumUsers(res.data);
+          setConversations(res.conversations);
         }
       } catch (err) {
-        // Optionally handle error
+        console.error('Error fetching conversations:', err);
+      } finally {
+        setLoadingConversations(false);
       }
     };
-    fetchPremiumUsers();
+
+    const user = apiService.getCurrentUser();
+    setCurrentUser(user);
+    fetchConversations();
   }, []);
 
   const handleMessageUser = (user) => {
@@ -32,66 +41,95 @@ const TrainerMessage = () => {
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Sidebar role="trainer" activePage="message" />
       <div className="flex-1 flex flex-col min-h-screen">
-        <PageHeader title="Message" />
+        <PageHeader title="Messages" profilePicture={currentUser?.profilePicture} />
         <main className="flex-1 p-8 flex flex-col items-center">
-          <div className="w-full max-w-3xl mx-auto">
-            {/* User List Card */}
-            <div className="bg-white rounded-2xl shadow p-0 border border-gray-100">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Start Messaging</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {premiumUsers.length === 0 && (
-                    <tr>
-                      <td colSpan={3} className="text-gray-500 text-center py-6">No premium users available.</td>
-                    </tr>
-                  )}
-                  {premiumUsers.map((user, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 flex items-center gap-3">
-                        {user.profilePicture ? (
-                          <img src={user.profilePicture} alt={user.name || user.username} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-lg">
-                            {(user.name || user.username).split(' ').map(n => n[0]).join('')}
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-semibold text-gray-900">{user.name || user.username}</div>
-                          <div className="text-xs text-gray-500">{user.username}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
-                          <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span> Active
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <button className="p-2 rounded hover:bg-gray-100 text-black" title="Message" onClick={() => handleMessageUser(user)}>
-                          <MessageCircle className="w-6 h-6" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="w-full max-w-4xl mx-auto">
+            {/* Messages Header */}
+            <div className="bg-white rounded-2xl shadow p-6 border border-gray-100 mb-6">
+              <div className="text-xl font-bold mb-2 text-gray-900">Messages</div>
+              <div className="text-gray-600">Manage conversations with your premium users</div>
             </div>
-            {/* Chat Modal Placeholder */}
-            {showChat && selectedUser && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-                <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
-                  <div className="text-lg font-semibold mb-4">Chat with {selectedUser.name || selectedUser.username}</div>
-                  <div className="mb-6">(Chat UI goes here)</div>
-                  <div className="flex justify-end gap-3">
-                    <button onClick={() => setShowChat(false)} className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Close</button>
-                  </div>
+
+            {/* Conversations List */}
+            <div className="bg-white rounded-2xl shadow border border-gray-100">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  Conversations <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">{conversations.length}</span>
                 </div>
               </div>
+              
+              {loadingConversations ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500">Loading conversations...</div>
+                </div>
+              ) : conversations.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500 mb-2">No messages yet</div>
+                  <div className="text-sm text-gray-400">Messages from premium users will appear here</div>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {conversations.map((conversation, i) => (
+                    <div 
+                      key={i} 
+                      className="flex items-center gap-4 p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setSelectedUser(conversation._id);
+                        setShowChat(true);
+                      }}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                        {conversation._id.profilePicture ? (
+                          <img src={conversation._id.profilePicture} alt="User" className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-6 h-6 text-blue-500" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="font-semibold text-gray-900 truncate">
+                            {conversation._id.name || conversation._id.username}
+                          </div>
+                          {conversation._id.membershipStatus && conversation._id.membershipStatus !== 'free' && (
+                            <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold capitalize">
+                              {conversation._id.membershipStatus}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-600 truncate mb-1">
+                          {conversation.lastMessage?.text || 'No messages yet'}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {conversation.lastMessage?.timestamp 
+                            ? new Date(conversation.lastMessage.timestamp).toLocaleString()
+                            : 'No recent activity'
+                          }
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        {conversation.messageCount > 0 && (
+                          <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                            {conversation.messageCount}
+                          </span>
+                        )}
+                        <button className="p-2 rounded-full hover:bg-gray-100 text-blue-500" title="Open Chat">
+                          <MessageCircle className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Chat Modal */}
+            {showChat && selectedUser && (
+              <TrainerToUserChatModal 
+                open={showChat} 
+                onClose={() => setShowChat(false)} 
+                trainer={currentUser}
+                user={selectedUser}
+              />
             )}
           </div>
         </main>

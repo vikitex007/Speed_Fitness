@@ -547,6 +547,54 @@ const getPremiumUsers = async (req, res) => {
   }
 };
 
+// Get trainer data for premium users
+const getTrainerData = async (req, res) => {
+  try {
+    // Find a trainer (for now, we'll get the first available trainer)
+    // In a real application, you might want to assign specific trainers to specific users
+    const trainer = await User.findOne({
+      userType: "trainer",
+      isActive: true,
+    }).select("-password");
+
+    if (!trainer) {
+      return res.status(404).json({
+        success: false,
+        message: "No trainer available at the moment",
+      });
+    }
+
+    // Return trainer data with some additional fields for the frontend
+    const trainerData = {
+      id: trainer._id,
+      name: trainer.username,
+      experience: "15 Years", // This could be stored in the database
+      achievements: "6x Mr. Olympia", // This could be stored in the database
+      avatar: trainer.profilePicture || null,
+      email: trainer.email || null,
+      phone: trainer.phone || null,
+      specialization: trainer.specialization || "General Fitness",
+      bio:
+        trainer.bio ||
+        "Experienced personal trainer dedicated to helping clients achieve their fitness goals.",
+      rating: trainer.rating || 4.8,
+      totalClients: trainer.totalClients || 150,
+    };
+
+    res.json({
+      success: true,
+      data: trainerData,
+    });
+  } catch (error) {
+    console.error("Get trainer data error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -560,4 +608,5 @@ module.exports = {
   recordWorkout,
   getAllUsers,
   getPremiumUsers,
+  getTrainerData,
 };

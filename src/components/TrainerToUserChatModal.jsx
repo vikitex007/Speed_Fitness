@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, User, Send } from 'lucide-react';
 import apiService from '../services/api';
 
-const TrainerChatModal = ({ open, onClose, trainer, user }) => {
+const TrainerToUserChatModal = ({ open, onClose, trainer, user }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,10 +12,10 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
 
   // Fetch messages when modal opens
   useEffect(() => {
-    if (open && trainer?.id) {
+    if (open && user?._id) {
       fetchMessages();
     }
-  }, [open, trainer?.id]);
+  }, [open, user?._id]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -30,7 +30,12 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiService.getMessages(trainer.id);
+      let response;
+      if (trainer?.userType === 'trainer') {
+        response = await apiService.getMessagesWithUser(user._id);
+      } else {
+        response = await apiService.getMessages(user._id);
+      }
       if (response.success) {
         setMessages(response.messages);
       } else {
@@ -51,8 +56,12 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
     try {
       setSending(true);
       setError(null);
-      
-      const response = await apiService.sendMessage(trainer.id, input.trim());
+      let response;
+      if (trainer?.userType === 'trainer') {
+        response = await apiService.sendMessageToUser(user._id, input.trim());
+      } else {
+        response = await apiService.sendMessage(user._id, input.trim());
+      }
       if (response.success) {
         setMessages(prev => [...prev, response.message]);
         setInput('');
@@ -78,16 +87,19 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden">
-              {trainer.avatar ? (
-                <img src={trainer.avatar} alt="Trainer" className="w-full h-full object-cover" />
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+              {user.profilePicture ? (
+                <img src={user.profilePicture} alt="User" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-6 h-6 text-purple-500" />
+                <User className="w-6 h-6 text-blue-500" />
               )}
             </div>
             <div>
-              <div className="font-bold text-base text-gray-900">Trainer</div>
-              <div className="text-xs text-gray-500">@{trainer.name?.toLowerCase()}</div>
+              <div className="font-bold text-base text-gray-900">{user.name || user.username}</div>
+              <div className="text-xs text-gray-500">@{user.username?.toLowerCase()}</div>
+              {user.membershipStatus && user.membershipStatus !== 'free' && (
+                <div className="text-xs text-purple-600 font-semibold capitalize">{user.membershipStatus} Member</div>
+              )}
             </div>
           </div>
         </div>
@@ -114,39 +126,39 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
             <div className="flex items-center justify-center h-full">
               <div className="text-gray-500 text-center">
                 <div className="font-semibold mb-2">No messages yet</div>
-                <div className="text-sm">Start a conversation with your trainer!</div>
+                <div className="text-sm">Start a conversation with {user.name || user.username}!</div>
               </div>
             </div>
           ) : (
             messages.map((msg, i) => {
-              const isUser = msg.sender._id === user?._id || msg.sender === user?._id;
+              const isTrainer = msg.sender._id === trainer?._id || msg.sender === trainer?._id;
               return (
-                <div key={msg._id || i} className={`flex mb-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                  {!isUser && (
-                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                      {trainer.avatar ? (
-                        <img src={trainer.avatar} alt="Trainer" className="w-full h-full object-cover" />
+                <div key={msg._id || i} className={`flex mb-3 ${isTrainer ? 'justify-end' : 'justify-start'}`}>
+                  {!isTrainer && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                      {user.profilePicture ? (
+                        <img src={user.profilePicture} alt="User" className="w-full h-full object-cover" />
                       ) : (
-                        <User className="w-5 h-5 text-purple-500" />
+                        <User className="w-5 h-5 text-blue-500" />
                       )}
                     </div>
                   )}
                   <div className={`px-4 py-2 rounded-2xl text-sm font-medium shadow max-w-xs break-words ${
-                    isUser 
+                    isTrainer 
                       ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' 
                       : 'bg-white text-gray-900 border border-gray-200'
                   }`}>
                     {msg.text}
-                    <div className={`text-xs mt-1 ${isUser ? 'text-white/70' : 'text-gray-500'}`}>
+                    <div className={`text-xs mt-1 ${isTrainer ? 'text-white/70' : 'text-gray-500'}`}>
                       {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                  {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-2">
-                      {user?.profilePicture ? (
-                        <img src={user.profilePicture} alt="User" className="w-full h-full object-cover" />
+                  {isTrainer && (
+                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-2">
+                      {trainer?.profilePicture ? (
+                        <img src={trainer.profilePicture} alt="Trainer" className="w-full h-full object-cover" />
                       ) : (
-                        <User className="w-5 h-5 text-blue-500" />
+                        <User className="w-5 h-5 text-purple-500" />
                       )}
                     </div>
                   )}
@@ -190,4 +202,4 @@ const TrainerChatModal = ({ open, onClose, trainer, user }) => {
   );
 };
 
-export default TrainerChatModal; 
+export default TrainerToUserChatModal; 

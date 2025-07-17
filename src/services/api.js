@@ -298,6 +298,62 @@ class ApiService {
     });
     return await this.handleResponse(response);
   }
+
+  async getTrainerData() {
+    const response = await fetch(`${this.baseURL}/auth/trainer`, {
+      method: "GET",
+      headers: this.getAuthHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Message APIs
+  async getMessages(trainerId) {
+    const response = await fetch(`${this.baseURL}/messages/${trainerId}`, {
+      method: "GET",
+      headers: this.getAuthHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async sendMessage(trainerId, text) {
+    const response = await fetch(`${this.baseURL}/messages/${trainerId}`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ text }),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async getTrainerConversations() {
+    const response = await fetch(
+      `${this.baseURL}/messages/trainer/conversations`,
+      {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      }
+    );
+    return await this.handleResponse(response);
+  }
+
+  // Fetch messages as a trainer with a specific user
+  async getMessagesWithUser(userId) {
+    const response = await fetch(`${this.baseURL}/messages/user/${userId}`, {
+      method: "GET",
+      headers: this.getAuthHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Send message as a trainer to a user
+  async sendMessageToUser(userId, text) {
+    const response = await fetch(`${this.baseURL}/messages/user/${userId}`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ text }),
+    });
+    return await this.handleResponse(response);
+  }
 }
 
 // Create and export a singleton instance

@@ -523,12 +523,12 @@ const UserDashboard = () => {
                       >
                         {membershipPaused ? 'Resume Membership' : 'Pause Membership'}
                       </button>
-                <button
+                {/* <button
                         className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition-all shadow-lg"
                         onClick={() => navigate('/premium')}
                 >
                         Manage Plan
-                </button>
+                </button> */}
                 <button
                         className="w-full bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg"
                         onClick={() => setShowCancelDialog(true)}

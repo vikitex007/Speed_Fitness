@@ -145,7 +145,7 @@ const TrainerEditProfile = () => {
       <Sidebar role="trainer" activePage="editprofile" />
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        <PageHeader title="Edit Profile" />
+        <PageHeader title="Edit Profile" profilePicture={currentUser?.profilePicture} />
         {/* Content */}
         <main className="flex-1 p-8 flex flex-col items-center justify-center">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative">
@@ -178,40 +178,64 @@ const TrainerEditProfile = () => {
                 <div className="text-sm text-gray-600 mt-1">Change Picture</div>
               </div>
               {/* Username */}
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Username"
-                required
-              />
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 bg-white"
+                  placeholder="Enter your username"
+                  required
+                />
+              </div>
               {/* Passwords */}
-              <input
-                type="password"
-                name="currentPassword"
-                value={currentPassword}
-                onChange={handleCurrentPasswordChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-50"
-                placeholder="Current Password"
-              />
-              <input
-                type="password"
-                name="password"
-                value={password}
-                onChange={handlePasswordChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="New Password (leave blank to keep current)"
-              />
-              <input
-                type="password"
-                name="confirmPassword"
-                value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Confirm New Password"
-              />
+              <div>
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={currentPassword}
+                  onChange={handleCurrentPasswordChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-50 text-gray-900"
+                  placeholder="Enter your current password"
+                />
+              </div>
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 bg-white"
+                  placeholder="Enter new password (leave blank to keep current)"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 bg-white"
+                  placeholder="Confirm your new password"
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg shadow transition"
@@ -227,10 +251,10 @@ const TrainerEditProfile = () => {
       {showLogoutDialog && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
-            <div className="text-lg font-semibold mb-4">Confirm Logout</div>
-            <div className="mb-6">Are you sure you want to logout?</div>
+            <div className="text-lg font-semibold mb-4 text-gray-900">Confirm Logout</div>
+            <div className="mb-6 text-gray-700">Are you sure you want to logout?</div>
             <div className="flex justify-end gap-3">
-              <button onClick={cancelLogout} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
+              <button onClick={cancelLogout} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">Cancel</button>
               <button onClick={confirmLogout} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Logout</button>
             </div>
           </div>

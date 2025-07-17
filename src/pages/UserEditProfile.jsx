@@ -248,6 +248,7 @@ const EditProfile = () => {
                 />
                 <input
                   type="password"
+                  
                   name="confirmPassword"
                   placeholder="Confirm New Password"
                   value={confirmPassword}
